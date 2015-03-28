@@ -162,7 +162,7 @@ svg {
                 .sort(function(a, b) { return b.dy - a.dy; });
           
             link.append("title")
-                .text(function(d) { return d.source.event + " → " + d.target.event + "\n" + format(d.count); });
+                .text(function(d) { return d.source.event + " → " + d.target.event + "\n" + d.count; });
           
             var node = svg.append("g").selectAll(".node")
                 .data(nodesArray)
@@ -180,7 +180,7 @@ svg {
                 .style("fill", function(d) { return d.color = colorScale(++colorIndex); })
                 .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
               .append("title")
-                .text(function(d) { return d.event + "\n" + format(d.count); });
+                .text(function(d) { return d.event + "\n" + d.count; });
           
             node.append("text")
                 .attr("x", -6)
