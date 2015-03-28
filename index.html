@@ -168,6 +168,10 @@ svg {
 
         function renderGraph() {
             var maxCount = _.max(_.pluck(nodesArray, 'count'));
+            
+            _.each(linksArray, function (link) {
+                link.value = link.target.count;
+            });
 
             // update scale domains for the new data
             countScale.domain([0, maxCount]);
