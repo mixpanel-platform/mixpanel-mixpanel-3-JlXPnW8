@@ -28,6 +28,15 @@ svg {
   stroke-opacity: .2;
   fill: none;
 }
+
+.node, .link {
+  opacity: 1;
+  -webkit-transition: opacity .4s;
+}
+
+.hidden {
+  opacity: 0;
+}
     </style>
   </head>
   <body class="mixpanel-platform-body">
@@ -168,13 +177,8 @@ svg {
 
             var link = links.enter()
               .append("path")
-                .attr("class", "link")
+                .attr("class", "link hidden")
                 .style("stroke-width", function(d) { return Math.max(1, d.dy); });
-                
-            link
-              .style("opacity", 0)
-              .transition().duration(400)
-                .style("opacity", 1);
                 
             link
                 .append("title")
@@ -184,13 +188,14 @@ svg {
               .sort(function(a, b) { return b.dy - a.dy; })
               .transition().duration(400)
                 .attr("d", path)
+                .classed('hidden', false);
 
          
             nodes = nodes.data(nodesArray);
             
             var node = nodes.enter()
               .append("g")
-                .attr("class", "node")
+                .attr("class", "node hidden")
               .call(
                 d3.behavior.drag()
                   .origin(function(d) { return d; })
@@ -201,11 +206,7 @@ svg {
             nodes
               .transition().duration(400)
                 .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-                
-            node
-              .style("opacity", 0)
-              .transition().duration(400)
-                .style("opacity", 1);
+                .classed('hidden', false);
           
             node.append("rect")
                 .attr("height", function(d) { return d.dy; })
