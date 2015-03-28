@@ -113,9 +113,12 @@ svg {
             if (!_.contains(eventsArray, event)) {
                 eventsArray.push(event); // add the new event to our events array
 
-                var funnels = getFunnels(eventsArray);
-                _.each(funnels, function (funnel) { // loop over funnels
-                    runQuery(funnel);
+                // Do an initial query to render the first event node
+                var $deferreds = _.map(getFunnels(eventsArray), function (funnel) {
+                    return runQuery(funnel);
+                });
+                $.when.apply($, $deferreds).then(function () {
+                    renderGraph();
                 });
             }
         });
