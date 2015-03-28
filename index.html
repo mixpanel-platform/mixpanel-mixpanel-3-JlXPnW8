@@ -205,7 +205,7 @@ svg {
                 
             nodes
               .transition().duration(400)
-                .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+                .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
                 .classed('hidden', false);
           
             node.append("rect")
