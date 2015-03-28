@@ -143,6 +143,9 @@ svg {
           .size([width, height]);
 
         var path = sankey.link();
+        
+        var links = svg.append('g').selectAll('.link');
+        var nodes = svg.append('g').selectAll('.node');
 
         function renderGraph() {
             var maxCount = _.max(_.pluck(nodesArray, 'count'));
@@ -158,9 +161,10 @@ svg {
                 
             console.log(nodesArray)
             console.log(linksArray)
+            
+            links = links.data(linksArray);
 
-            var link = svg.append("g").selectAll(".link")
-                .data(linksArray)
+            var link = links
               .enter().append("path")
                 .attr("class", "link")
                 .attr("d", path)
@@ -169,9 +173,10 @@ svg {
           
             link.append("title")
                 .text(function(d) { return d.source.event + " → " + d.target.event + "\n" + d.count; });
-          
-            var node = svg.append("g").selectAll(".node")
-                .data(nodesArray)
+         
+            nodes = nodes.data(nodesArray);
+            
+            var node = nodes
               .enter().append("g")
                 .attr("class", "node")
                 .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
