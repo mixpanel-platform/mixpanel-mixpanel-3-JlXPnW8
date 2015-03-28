@@ -47,7 +47,8 @@ svg {
             // Call the funnel endpoint passing events
             // If events is ['A', 'B', 'C'], this is equivalent to calling
             // MP.api.funnel('A', 'B', 'C') ...
-            return MP.api.funnel.apply(MP.api, events).done(function(funnelData) {
+            var $dfr = MP.api.funnel.apply(MP.api, events);
+            $dfr.done(function(funnelData) {
 
                 // Sum step counts
                 var steps = _.map(funnelData, function (step) {
@@ -95,6 +96,7 @@ svg {
                     }
                 });
             });
+            return $dfr;
         };
 
         // Do an initial query to render the first event node
@@ -131,7 +133,6 @@ svg {
 
         var colorScale = d3.scale.category20(); // used with colorIndex to select a different color for each node
         var countScale = d3.scale.linear().range([0, 40]);   // maps our link widths to values from 0px to 40px
-        var strengthScale = d3.scale.linear().range([0, 1]); // Maps our link strengths to values from 0 to 1
 
         var colorIndex = 0; // incremented to select a different color for each node
         var nodeIndex = 0;  // incremented to be display a funnel step number in node labels
@@ -150,8 +151,7 @@ svg {
             var maxCount = _.max(_.pluck(nodesArray, 'count'));
 
             // update scale domains for the new data
-            //countScale.domain([0, maxCount]);
-            //strengthScale.domain([0, maxCount]);
+            countScale.domain([0, maxCount]);
 
             sankey
                 .nodes(nodesArray)
