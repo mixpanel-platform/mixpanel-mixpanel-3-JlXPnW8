@@ -150,8 +150,8 @@ svg {
             var maxCount = _.max(_.pluck(nodesArray, 'count'));
 
             // update scale domains for the new data
-            countScale.domain([0, maxCount]);
-            strengthScale.domain([0, maxCount]);
+            //countScale.domain([0, maxCount]);
+            //strengthScale.domain([0, maxCount]);
 
             sankey
                 .nodes(nodesArray)
