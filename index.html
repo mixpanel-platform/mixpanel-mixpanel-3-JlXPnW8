@@ -68,6 +68,7 @@ svg {
                         nodesMap[event].count = _.max([nodesMap[event].count, count]);
                     } else if (count) { // otherwise create node if it has a non-zero count
                         // add the new node to our data structures
+                        step.value = step.count;
                         nodesMap[event] = step;
                         nodesArray.push(step);
                     }
@@ -85,8 +86,7 @@ svg {
                             var link = {
                                 // link target and source values are set as corresponding nodes
                                 source: nodesMap[step.event],
-                                target: nodesMap[nextStep.event],
-                                count: nextStep.count // link count is the target node count
+                                target: nodesMap[nextStep.event]
                             };
                             // add the new link to our data structures
                             linksMap[step.event + '-' + nextStep.event] = link;
