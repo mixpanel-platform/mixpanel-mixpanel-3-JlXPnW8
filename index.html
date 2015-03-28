@@ -188,7 +188,9 @@ svg {
               .sort(function(a, b) { return b.dy - a.dy; })
               .transition().duration(400)
                 .attr("d", path)
-                .classed('hidden', false);
+                .each('end', function () {
+                    d3.select(this).classed('hidden', false);
+                });
 
          
             nodes = nodes.data(nodesArray);
@@ -206,7 +208,9 @@ svg {
             nodes
               .transition().duration(400)
                 .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-                .classed('hidden', false);
+                .each('end', function () {
+                    d3.select(this).classed('hidden', false);
+                });
           
             node.append("rect")
                 .attr("height", function(d) { return d.dy; })
