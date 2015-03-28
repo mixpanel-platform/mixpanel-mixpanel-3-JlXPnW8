@@ -177,17 +177,18 @@ svg {
               .sort(function(a, b) { return b.dy - a.dy; });
          
             nodes = nodes.data(nodesArray);
+            
             var node = nodes.enter()
               .append("g")
-                .attr("class", "node")
+                .attr("class", "node");
+                
+            nodes.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
               .call(
                 d3.behavior.drag()
                   .origin(function(d) { return d; })
                   .on("dragstart", function() { this.parentNode.appendChild(this); })
                   .on("drag", dragmove)
               );
-                
-            nodes.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
           
             node.append("rect")
                 .attr("height", function(d) { return d.dy; })
