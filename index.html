@@ -174,7 +174,7 @@ svg {
                   .text(function(d) { return d.source.event + " → " + d.target.event + "\n" + d.count; });
             
             links
-              .sort(function(a, b) { return b.dy - a.dy; });
+              .sort(function(a, b) { return b.dy - a.dy; })
               .transition().duration(400)
                 .attr("d", path)
 
