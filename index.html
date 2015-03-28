@@ -100,7 +100,10 @@ svg {
         };
 
         // Do an initial query to render the first event node
-        runQuery(eventsArray);
+        var funnels = getFunnels(eventsArray);
+        _.each(funnels, function (funnel) { // loop over funnels
+          runQuery(funnel);
+        });
 
         // When the event select changes, re-query
         eventSelect.on('change', function () {
