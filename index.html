@@ -1,15 +1,249 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/css/reset.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script> <!-- Add this line -->
+    <style>
+svg {
+  background: #fff;
+}
+
+.node {
+  stroke-width: 0;
+  fill-opacity: 0.4;
+}
+
+.node text {
+  text-anchor: middle;
+  alignment-baseline: middle;
+  fill-opacity: 1;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+  stroke-linecap: round;
+}
+    </style>
   </head>
   <body class="mixpanel-platform-body">
-    <h1>Hello, World!</h1>
+    <div class="mixpanel-platform-section">
+      <div id="eventSelect"></div>
+    </div>
     <script>
-      // Run queries and display results here
+        var eventsArray = ['$signup'];
+        var nodesMap = {}, nodesArray = []; // stores our node data
+        var linksMap = {}, linksArray = []; // stores our link data
+
+        var eventSelect = $('#eventSelect').MPEventSelect();
+
+        var runQuery = function (events) {
+            console.log('Making a funnel query with events:', events);
+
+            // Call the funnel endpoint passing events
+            // If events is ['A', 'B', 'C'], this is equivalent to calling
+            // MP.api.funnel('A', 'B', 'C') ...
+            MP.api.funnel.apply(MP.api, events).done(function(funnelData) {
+
+                // Sum step counts
+                var steps = _.map(funnelData, function (step) {
+                    return {
+                        event: _.first(_.values(step)).event,
+                        count: _.sum(_.pluck(step, 'count'))
+                    };
+                });
+
+                // Add nodes
+                _.each(steps, function (step, i) {
+                    step = _.clone(step); // copy step so that it isn't modified
+                    var event = step.event;
+                    var count = step.count;
+
+                    if (_.has(nodesMap, event)) { // if the node already exists check its count
+                        // Each node's count should be the max value it has in any funnel
+                        nodesMap[event].count = _.max([nodesMap[event].count, count]);
+                    } else if (count) { // otherwise create node if it has a non-zero count
+                        // add the new node to our data structures
+                        nodesMap[event] = step;
+                        nodesArray.push(step);
+                    }
+                });
+
+                // Add links
+                _.each(steps, function (step, i) {
+                    var nextStep = steps[i + 1];
+
+                    // Only create a link if nextStep exists and has a non-zero count
+                    if (nextStep && nextStep.count && _.has(nodesMap, nextStep.event)) {
+
+                        // Only create a link if one doesn't exist for these two events yet
+                        if (!_.has(linksMap, step.event + '-' + nextStep.event)) {
+                            var link = {
+                                // link target and source values are set as corresponding nodes
+                                source: nodesMap[step.event],
+                                target: nodesMap[nextStep.event],
+                                count: nextStep.count // link count is the target node count
+                            };
+                            // add the new link to our data structures
+                            linksMap[step.event + '-' + nextStep.event] = link;
+                            linksArray.push(link);
+                        }
+                    }
+                });
+
+                renderGraph();
+            });
+        };
+
+        // Do an initial query to render the first event node
+        runQuery(eventsArray);
+
+        // When the event select changes, re-query
+        eventSelect.on('change', function () {
+            var event = eventSelect.MPEventSelect('value');
+
+            // Only add events that we aren't already querying on
+            if (!_.contains(eventsArray, event)) {
+                eventsArray.push(event); // add the new event to our events array
+
+                var funnels = getFunnels(eventsArray);
+                _.each(funnels, function (funnel) { // loop over funnels
+                    runQuery(funnel);
+                });
+            }
+        });
+
+        var width = 960;  // SVG element width
+        var height = 640; // SVG element height
+
+        var svg = d3.select("body").append("svg") // the SVG element
+            .attr("width", width)
+            .attr("height", height);
+
+        var linkElements = svg.selectAll(".link"); // the link elements
+        var nodeElements = svg.selectAll(".node"); // the node elements
+
+        var colorScale = d3.scale.category20(); // used with colorIndex to select a different color for each node
+        var countScale = d3.scale.linear().range([0, 40]);   // maps our link widths to values from 0px to 40px
+        var strengthScale = d3.scale.linear().range([0, 1]); // Maps our link strengths to values from 0 to 1
+
+        var colorIndex = 0; // incremented to select a different color for each node
+        var nodeIndex = 0;  // incremented to be display a funnel step number in node labels
+
+        var sankey = d3.sankey()
+          .nodeWidth(15)
+          .nodePadding(10)
+          .size([width, height]);
+
+        var path = sankey.link();
+
+        function renderGraph() {
+            var maxCount = _.max(_.pluck(nodesArray, 'count'));
+
+            // update scale domains for the new data
+            countScale.domain([0, maxCount]);
+            strengthScale.domain([0, maxCount]);
+
+            sankeyv
+                .nodes(nodesArray)
+                .links(linksArray)
+                .layout(32);
+
+            var link = svg.append("g").selectAll(".link")
+                .data(energy.links)
+              .enter().append("path")
+                .attr("class", "link")
+                .attr("d", path)
+                .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+                .sort(function(a, b) { return b.dy - a.dy; });
+          
+            link.append("title")
+                .text(function(d) { return d.source.event + " → " + d.target.event + "\n" + format(d.count); });
+          
+            var node = svg.append("g").selectAll(".node")
+                .data(energy.nodes)
+              .enter().append("g")
+                .attr("class", "node")
+                .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+              .call(d3.behavior.drag()
+                .origin(function(d) { return d; })
+                .on("dragstart", function() { this.parentNode.appendChild(this); })
+                .on("drag", dragmove));
+          
+            node.append("rect")
+                .attr("height", function(d) { return d.dy; })
+                .attr("width", sankey.nodeWidth())
+                .style("fill", function(d) { return d.color = colorScale(++colorIndex); })
+                .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
+              .append("title")
+                .text(function(d) { return d.event + "\n" + format(d.count); });
+          
+            node.append("text")
+                .attr("x", -6)
+                .attr("y", function(d) { return d.dy / 2; })
+                .attr("dy", ".35em")
+                .attr("text-anchor", "end")
+                .attr("transform", null)
+                .text(function(d) { return d.event; })
+              .filter(function(d) { return d.x < width / 2; })
+                .attr("x", 6 + sankey.nodeWidth())
+                .attr("text-anchor", "start");
+          
+            function dragmove(d) {
+              d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
+              sankey.relayout();
+              link.attr("d", path);
+            }
+        }
+
+        // Takes a list, returns all subsets of that list (excluding the empty set - [])
+        // See http://stackoverflow.com/questions/5752002/find-all-possible-subset-combos-in-an-array
+        function getSubsets(input){
+            var allSubsets = [];
+            var addSubsets = function(n, input, subset) {
+                if (n) {
+                    _.each(input, function (item, i) {
+                        addSubsets(n - 1, input.slice(i + 1), subset.concat([item]));
+                    });
+                } else if (subset.length) {
+                    allSubsets.push(subset);
+                }
+            }
+            _.each(input, function (item, i) {
+                addSubsets(i, input, []);
+            });
+            allSubsets.push(input);
+            return allSubsets;
+        }
+
+        // Gets all sub-funnels from a list of events, always including the first and last event
+        // [A, B, C, D] =>
+        //   [ [A, D],
+        //     [A, B, D],
+        //     [A, C, D],
+        //     [A, B, C, D] ]
+        function getFunnels(events) {
+            if (events.length <= 2) { // No sub-funnels if there are 2 or less events
+                return [events];
+            }
+
+            var first = events[0];
+            var last = events.slice(-1)[0];
+            var rest = events.slice(1, -1);
+
+            var funnels = [[first, last]];
+            var subFunnels = getSubsets(rest)
+
+            _.each(subFunnels, function (funnel) {
+                funnel = [first].concat(funnel).concat([last]);
+                funnels.push(funnel);
+            });
+
+            return funnels;
+        }
     </script>
   </body>
 </html>
