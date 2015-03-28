@@ -47,7 +47,7 @@ svg {
             // Call the funnel endpoint passing events
             // If events is ['A', 'B', 'C'], this is equivalent to calling
             // MP.api.funnel('A', 'B', 'C') ...
-            MP.api.funnel.apply(MP.api, events).done(function(funnelData) {
+            return MP.api.funnel.apply(MP.api, events).done(function(funnelData) {
 
                 // Sum step counts
                 var steps = _.map(funnelData, function (step) {
@@ -94,15 +94,15 @@ svg {
                         }
                     }
                 });
-
-                renderGraph();
             });
         };
 
         // Do an initial query to render the first event node
         var funnels = getFunnels(eventsArray);
-        _.each(funnels, function (funnel) { // loop over funnels
-          runQuery(funnel);
+        $.when(_.map(funnels, function (funnel) { // loop over funnels
+            return runQuery(funnel);
+        })).then(function () {
+            renderGraph();
         });
 
         // When the event select changes, re-query
