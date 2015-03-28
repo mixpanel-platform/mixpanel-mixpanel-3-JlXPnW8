@@ -158,7 +158,8 @@ svg {
             sankey
                 .nodes(nodesArray)
                 .links(linksArray)
-                .layout(32);
+                .layout(32)
+                .relayout();
                 
             console.log(nodesArray)
             console.log(linksArray)
@@ -180,15 +181,15 @@ svg {
             
             var node = nodes.enter()
               .append("g")
-                .attr("class", "node");
-                
-            nodes.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+                .attr("class", "node")
               .call(
                 d3.behavior.drag()
                   .origin(function(d) { return d; })
                   .on("dragstart", function() { this.parentNode.appendChild(this); })
                   .on("drag", dragmove)
               );
+                
+            nodes.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
           
             node.append("rect")
                 .attr("height", function(d) { return d.dy; })
