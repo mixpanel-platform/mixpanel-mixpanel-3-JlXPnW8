@@ -168,22 +168,26 @@ svg {
             var link = links.enter()
               .append("path")
                 .attr("class", "link")
-                .attr("d", path)
                 .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-                .sort(function(a, b) { return b.dy - a.dy; });
-          
-            link.append("title")
-                .text(function(d) { return d.source.event + " → " + d.target.event + "\n" + d.count; });
+                .append("title")
+                  .text(function(d) { return d.source.event + " → " + d.target.event + "\n" + d.count; });
+            
+            links
+              .attr("d", path)
+              .sort(function(a, b) { return b.dy - a.dy; });
          
             nodes = nodes.data(nodesArray);
             var node = nodes.enter()
               .append("g")
                 .attr("class", "node")
-                .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-              .call(d3.behavior.drag()
-                .origin(function(d) { return d; })
-                .on("dragstart", function() { this.parentNode.appendChild(this); })
-                .on("drag", dragmove));
+              .call(
+                d3.behavior.drag()
+                  .origin(function(d) { return d; })
+                  .on("dragstart", function() { this.parentNode.appendChild(this); })
+                  .on("drag", dragmove)
+              );
+                
+            nodes.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
           
             node.append("rect")
                 .attr("height", function(d) { return d.dy; })
