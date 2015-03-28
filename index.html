@@ -102,8 +102,7 @@ svg {
                             var link = {
                                 // link target and source values are set as corresponding nodes
                                 source: nodesMap[step.event],
-                                target: nodesMap[nextStep.event],
-                                value: nodesMap[nextStep.event].count
+                                target: nodesMap[nextStep.event]
                             };
                             // add the new link to our data structures
                             linksMap[step.event + '-' + nextStep.event] = link;
