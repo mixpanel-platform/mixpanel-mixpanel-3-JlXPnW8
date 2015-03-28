@@ -35,7 +35,7 @@ svg {
       <div id="eventSelect"></div>
     </div>
     <script>
-        var eventsArray = ['$signup', 'Viewed report', 'Tutorial shown'];
+        var eventsArray = ['$signup'];
         var nodesMap = {}, nodesArray = []; // stores our node data
         var linksMap = {}, linksArray = []; // stores our link data
 
@@ -136,7 +136,7 @@ svg {
 
         var sankey = d3.sankey()
           .nodeWidth(15)
-          .nodePadding(10)
+          .nodePadding(20)
           .size([width, height]);
 
         var path = sankey.link();
@@ -152,6 +152,9 @@ svg {
                 .nodes(nodesArray)
                 .links(linksArray)
                 .layout(32);
+                
+            console.log(nodesArray)
+            console.log(linksArray)
 
             var link = svg.append("g").selectAll(".link")
                 .data(linksArray)
