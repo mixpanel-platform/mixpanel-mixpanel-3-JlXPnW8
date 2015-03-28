@@ -98,8 +98,7 @@ svg {
         };
 
         // Do an initial query to render the first event node
-        var funnels = getFunnels(eventsArray);
-        $.when(_.map(funnels, function (funnel) { // loop over funnels
+        $.when(_.map(getFunnels(eventsArray), function (funnel) {
             return runQuery(funnel);
         })).then(function () {
             renderGraph();
