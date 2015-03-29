@@ -221,7 +221,7 @@ svg {
                 .style("fill", function(d) { return d.color = colorScale(++colorIndex); })
                 .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
               .append("title")
-                .text(function(d) { return d.event + "\n" + d.count; });
+                .text(function(d) { return d.event + "\n" + d.value; });
           
             node.append("text")
                 .attr("x", -6)
