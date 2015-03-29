@@ -188,17 +188,17 @@ svg {
 
             var link = links.enter()
               .append("path")
-                .attr("class", "link hidden")
-                .style("stroke-width", function(d) { return Math.max(1, d.dy); });
-                
+                .attr("class", "link hidden");
+
             link
-                .append("title")
-                  .text(function(d) { return d.source.event + " → " + d.target.event + "\n" + d.count; });
+              .append("title")
+                .text(function(d) { return d.source.event + " → " + d.target.event + "\n" + d.count; });
             
             links
               .sort(function(a, b) { return b.dy - a.dy; })
               .transition().duration(400)
                 .attr("d", path)
+                .style("stroke-width", function(d) { return Math.max(1, d.dy); });
                 .each('end', function () {
                     d3.select(this).classed('hidden', false);
                 });
