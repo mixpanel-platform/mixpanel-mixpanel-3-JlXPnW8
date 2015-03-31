@@ -15,6 +15,10 @@ body.mixpanel-platform-body, svg, html {
   background: #fff;
 }
 
+body.mixpanel-platform-body {
+  padding: 0 40px;
+}
+
 .mixpanel-platform-section {
   -webkit-box-shadow: none;
   box-shadow: none;
@@ -178,12 +182,12 @@ svg {
         var sankey = d3.sankey()
           .nodeWidth(15)
           .nodePadding(20)
-          .size([width - 160, height- 140]);
+          .size([width, height- 140]);
 
         var path = sankey.link();
         
-        var links = svg.append('g').attr('transform', 'translate(40, 100)').selectAll('.link');
-        var nodes = svg.append('g').attr('transform', 'translate(40, 100)').selectAll('.node');
+        var links = svg.append('g').attr('transform', 'translate(0, 100)').selectAll('.link');
+        var nodes = svg.append('g').attr('transform', 'translate(0, 100)').selectAll('.node');
 
         function renderGraph() {
             var maxCount = _.max(_.pluck(nodesArray, 'count'));
@@ -223,7 +227,6 @@ svg {
                     d3.select(this).classed('hidden', false);
                 });
 
-         
             nodes = nodes.data(nodesArray);
             
             var node = nodes.enter()
