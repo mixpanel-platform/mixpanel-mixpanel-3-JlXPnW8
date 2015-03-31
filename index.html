@@ -212,7 +212,7 @@ svg {
 
             link
               .append("title")
-                .text(function(d) { return d.source.event + " → " + d.target.event + "\n" + d.count; });
+                .text(function(d) { return d.source.event + " → " + d.target.event + "\n" + d.value; });
             
             links
               .sort(function(a, b) { return b.dy - a.dy; })
