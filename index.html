@@ -8,16 +8,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
     <script src="./sankey.js"></script>
     <style>
-body.mixpanel-platform-body {
+body.mixpanel-platform-body, svg, html {
+  padding: 0;
+  width: 100%;
+  height: 100%;
   background: #fff;
 }
 
 .mixpanel-platform-section {
   -webkit-box-shadow: none;
+  box-shadow: none;
+  border-radius: 0;
+  border-bottom: 1px solid #cfd4dc;
 }
-    
+
 svg {
-  margin: 40px;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .node {
@@ -49,10 +57,12 @@ svg {
   </head>
   <body class="mixpanel-platform-body">
     <div class="mixpanel-platform-section">
-      <div id="eventSelect"></div>
+      <div id="eventSelect" style="float:left;"></div>
+      <button id="resetEvents" style="float: right;">Reset events</button>
+      <div style="clear: both;"></div>
     </div>
     <script>
-        var eventsArray = ['$signup', 'Viewed report'];
+        var eventsArray = ['$signup', 'Viewed report', 'Viewed docs', 'Tutorial Shown', 'View pricing page'];
         var nodesMap = {}, nodesArray = []; // stores our node data
         var linksMap = {}, linksArray = []; // stores our link data
 
@@ -138,13 +148,22 @@ svg {
                 });
             }
         });
+        
+        resetEvents.on('click', function () {
+          eventsArray = [];
+          linksMap = {};
+          nodesMap = {};
+          linksArray.splice(0, linksArray.length); // empty array
+          nodesArray.splice(0, nodesArray.length); // empty array
+          nodeIndex = 0;
+          renderGraph();
+        });
 
-        var width = 880;  // SVG element width
-        var height = 560; // SVG element height
-
-        var svg = d3.select("body").append("svg") // the SVG element
-            .attr("width", width)
-            .attr("height", height);
+        var svg = d3.select("body").insert("svg", ":first-child"); // the SVG element
+        
+        var boundingBox = svg.node().getBoundingClientRect();
+        var width = boundingBox.width;
+        var height = boundingBox.height;
 
         var linkElements = svg.selectAll(".link"); // the link elements
         var nodeElements = svg.selectAll(".node"); // the node elements
