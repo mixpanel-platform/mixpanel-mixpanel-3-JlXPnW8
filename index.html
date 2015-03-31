@@ -178,12 +178,12 @@ svg {
         var sankey = d3.sankey()
           .nodeWidth(15)
           .nodePadding(20)
-          .size([width, height]);
+          .size([width - 80, height- 140]);
 
         var path = sankey.link();
         
-        var links = svg.append('g').selectAll('.link');
-        var nodes = svg.append('g').selectAll('.node');
+        var links = svg.append('g').style('transform', 'translate(40, 100)').selectAll('.link');
+        var nodes = svg.append('g').style('trassform', 'translate(40, 100)').selectAll('.node');
 
         function renderGraph() {
             var maxCount = _.max(_.pluck(nodesArray, 'count'));
