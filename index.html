@@ -129,7 +129,7 @@ svg {
             return runQuery(funnel);
         });
         $.when.apply($, $deferreds).then(function () {
-            renderGraph();
+            //renderGraph();
         });
 
         // When the event select changes, re-query
@@ -175,10 +175,10 @@ svg {
         var colorIndex = 0; // incremented to select a different color for each node
         var nodeIndex = 0;  // incremented to be display a funnel step number in node labels
 
-        var sankey = d3.sankey()
-          .nodeWidth(15)
-          .nodePadding(20)
-          .size([width, height- 140]);
+        //var sankey = d3.sankey()
+        //  .nodeWidth(15)
+        //  .nodePadding(20)
+        //  .size([width, height- 140]);
 
         var path = sankey.link();
         
@@ -318,10 +318,10 @@ svg {
         }
         
         console.log('nodesMap, linksMap, nodesArray, linksArray');
-        console.log(nodesMap);
-        console.log(linksMap);
-        console.log(nodesArray);
-        console.log(linksArray);
+        console.log(JSON.stringify(nodesMap, null, 4));
+        console.log(JSON.stringify(linksMap, null, 4));
+        console.log(JSON.stringify(nodesArray, null, 4));
+        console.log(JSON.stringify(linksArray, null, 4));
     </script>
   </body>
 </html>
